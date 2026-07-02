@@ -1,0 +1,31 @@
+# Build output
+/build/
+/dist/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.ninja_deps
+*.ninja_log
+
+# Compiled artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.pdb
+*.ilk
+
+# Editor / IDE
+.vs/
+.vscode/
+*.user
+*.code-workspace
+
+# OS cruft
+Thumbs.db
+Desktop.ini
+
+# NOTE: tessdata_best models (tessdata/*.traineddata) are intentionally tracked —
+# LeeOCR ships eng + spa so the repo/portable build works out of the box.
