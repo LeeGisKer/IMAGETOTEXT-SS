@@ -53,6 +53,18 @@ void trayBalloon(const wchar_t* msg, DWORD iconFlag = NIIF_INFO) {
     Shell_NotifyIconW(NIM_MODIFY, &g_nid);
 }
 
+// Reduce DLL-planting exposure for the portable install: drop the current
+// working directory and PATH from the search path used by any DLL the app loads
+// at runtime (LoadLibrary / delay-load), so a malicious DLL dropped in an
+// untrusted CWD can't be preloaded ahead of the ones shipped beside the exe.
+// Limitation: statically imported DLLs (tesseract, leptonica, MinGW runtime)
+// are resolved by the loader before WinMain runs; those rely on the standard
+// application-directory-first order plus running the app from a trusted folder.
+void hardenDllSearchPath() {
+    SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+    SetDllDirectoryW(L"");   // remove the current working directory from the search order
+}
+
 void enablePerMonitorV2Dpi() {
     HMODULE u = GetModuleHandleW(L"user32.dll");
     if (!u) return;
@@ -254,6 +266,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 }  // namespace
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {
+    hardenDllSearchPath();
     enablePerMonitorV2Dpi();
     g_config = leeocr::loadConfig();
     applyAutostart(g_config.autostart);   // keep the Run key in sync with config

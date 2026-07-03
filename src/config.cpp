@@ -76,7 +76,10 @@ Config loadConfig() {
     std::string j = readFile(configPath());
     if (j.empty()) return c;
     std::string s;
-    if (getString(j, "language", s) && !s.empty()) c.language = s;
+    // Only accept a known language tag; a malformed/hand-edited value falls back
+    // to the default rather than being passed on to Tesseract's Init.
+    if (getString(j, "language", s) && (s == "eng" || s == "spa" || s == "eng+spa"))
+        c.language = s;
     double d;
     if (getNumber(j, "hotkeyMods", d)) c.hotkeyMods = static_cast<unsigned>(d);
     if (getNumber(j, "hotkeyVk", d))   c.hotkeyVk   = static_cast<unsigned>(d);
